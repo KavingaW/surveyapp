@@ -7,7 +7,6 @@ import com.hsenid.surveyapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<UserDto> updateUser(@PathVariable(value = "id") final String userId, @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable(value = "id") final String userId, @RequestBody final UserDto userDto) {
         return new ResponseEntity<>(userService.updateUser(userId, userDto), HttpStatus.OK);
     }
 
@@ -52,8 +51,7 @@ public class UserController {
 
     @PostMapping("/resetPassword")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequestDto resetPasswordRequestDto) {
+    public ResponseEntity<String> resetPassword(@RequestBody final ResetPasswordRequestDto resetPasswordRequestDto) {
         return new ResponseEntity(userService.resetPassword(resetPasswordRequestDto), HttpStatus.OK);
-
     }
 }
