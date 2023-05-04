@@ -2,89 +2,48 @@ package com.hsenid.surveyapp.service;
 
 import com.hsenid.surveyapp.dto.QuestionRequestDto;
 import com.hsenid.surveyapp.dto.QuestionResponseDto;
-import com.hsenid.surveyapp.model.Question;
-import com.hsenid.surveyapp.repositoy.QuestionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-@Service
-public class QuestionService {
+public interface QuestionService {
 
-    @Autowired
-    QuestionRepository questionRepository;
+    /**
+     * create question
+     *
+     * @return a QuestionResponseDto
+     */
+    QuestionResponseDto createQuestion(QuestionRequestDto questionRequestDto);
 
-    public QuestionResponseDto createQuestion(QuestionRequestDto questionRequestDto) {
+    /**
+     * update question
+     *
+     * @return a QuestionResponseDto
+     */
+    QuestionResponseDto updateQuestion(QuestionRequestDto questionRequestDto, String id);
 
-        Question question = new Question();
+    /**
+     * delete question
+     */
+    void deleteQuestion(String questionId);
 
-        question.setText(questionRequestDto.getText());
-        question.setType(questionRequestDto.getType());
-        question.setOptions(questionRequestDto.getOptions());
+    /**
+     * get question by id
+     *
+     * @return a QuestionResponseDto
+     */
+    QuestionResponseDto getQuestionById(String questionId);
 
-        questionRepository.save(question);
-        return QuestionResponseDto.builder().text(question.getText()).type(question.getType()).options(question.getOptions()).build();
-    }
+    /**
+     * get question list
+     *
+     * @return list of {@link QuestionResponseDto}
+     */
+    List<QuestionResponseDto> getQuestions();
 
-    public QuestionResponseDto updateQuestion(QuestionRequestDto questionRequestDto, String id) {
-        Optional<Question> questionObj = questionRepository.findById(id);
-        if (questionObj.isPresent()) {
-            Question question = questionObj.get();
-
-            question.setText(questionRequestDto.getText());
-            question.setType(questionRequestDto.getType());
-            question.setOptions(questionRequestDto.getOptions());
-
-            questionRepository.save(question);
-
-            return QuestionResponseDto.builder().text(question.getText()).options(question.getOptions()).build();
-        }
-        return null;
-    }
-
-    public QuestionResponseDto deleteQuestion(String questionId) {
-        Optional<Question> questionObj = questionRepository.findById(questionId);
-        if (questionObj.isPresent()) {
-            Question question = questionObj.get();
-            questionRepository.deleteById(questionId);
-        }
-        return null;
-    }
-
-    public QuestionResponseDto getQuestionById(String questionId) {
-        Optional<Question> questionObj = questionRepository.findById(questionId);
-        if (questionObj.isPresent()) {
-            Question question = questionObj.get();
-            return QuestionResponseDto.builder().text(question.getText()).type(question.getType()).options(question.getOptions()).build();
-        }
-        return null;
-    }
-
-    public List<QuestionResponseDto> getQuestions() {
-
-        List<QuestionResponseDto> questionResponseDtos = new ArrayList<>();
-        List<Question> questionResponse = questionRepository.findAll();
-
-        questionResponse.forEach(question -> {
-            questionResponseDtos.add(QuestionResponseDto.builder().text(question.getText()).type(question.getType()).options(question.getOptions()).build());
-        });
-
-        return questionResponseDtos;
-
-    }
-
-    public List<QuestionResponseDto> getQuestionsByType(String type){
-        List<QuestionResponseDto> questionResponseDtos = new ArrayList<>();
-        List<Question> questionResponse = questionRepository.findAll();
-
-        questionResponse.forEach(question -> {
-            if (question.getType().equals(type))
-            questionResponseDtos.add(QuestionResponseDto.builder().text(question.getText()).type(question.getType()).options(question.getOptions()).build());
-        });
-
-        return questionResponseDtos;
-    }
+    /**
+     * get question by type
+     *
+     * @return a list of QuestionResponseDto
+     */
+    List<QuestionResponseDto> getQuestionsByType(String type);
 }
