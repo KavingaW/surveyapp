@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SurveyResponseDto {
+    private String id;
     private String title;
     private String description;
     private List<QuestionResponseDto> questions;

@@ -25,11 +25,10 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public SurveyResponseDto createSurvey(final SurveyRequestDto surveyRequestDto) {
-
+        logger.info("creating survey...");
         Survey survey = new Survey();
         List<Question> questions = new ArrayList<>();
         List<String> users = new ArrayList<>();
-
         surveyRequestDto.getQuestions().stream().forEach(questionDto -> {
             Question question = new Question();
             question.setId(questionDto.getId());
@@ -37,37 +36,27 @@ public class SurveyServiceImpl implements SurveyService {
             question.setType(questionDto.getType());
             question.setOptions(questionDto.getOptions());
             questions.add(question);
-
         });
-
         surveyRequestDto.getAssigned().stream().forEach(userRequestDto -> {
             users.add(userRequestDto.getId());
         });
-
         survey.setTitle(surveyRequestDto.getTitle());
         survey.setDescription(surveyRequestDto.getDescription());
         survey.setQuestions(questions);
         survey.setAssignedTo(users);
-
         surveyRepository.save(survey);
-
         logger.info("survey details saved");
-
-        return SurveyResponseDto.builder().title(survey.getTitle()).description(survey.getDescription()).questions(convertToQuestionResponseDto(questions)).assigned(survey.getAssignedTo()).build();
+        return SurveyResponseDto.builder().id(survey.getId()).title(survey.getTitle()).description(survey.getDescription()).questions(convertToQuestionResponseDto(questions)).assigned(survey.getAssignedTo()).build();
     }
 
     @Override
     public SurveyResponseDto updateSurvey(final String surveyId, final SurveyRequestDto surveyRequestDto) {
-
         Optional<Survey> surveyObj = surveyRepository.findById(surveyId);
-
         logger.info("update survey details");
         if (surveyObj.isPresent()) {
             Survey survey = surveyObj.get();
-
             List<Question> questions = new ArrayList<>();
             List<String> users = new ArrayList<>();
-
             surveyRequestDto.getQuestions().forEach(questionDto -> {
                 Question question = new Question();
                 question.setId(questionDto.getId());
@@ -76,20 +65,16 @@ public class SurveyServiceImpl implements SurveyService {
                 question.setOptions(questionDto.getOptions());
                 questions.add(question);
             });
-
             surveyRequestDto.getAssigned().stream().forEach(userRequestDto -> {
                 users.add(userRequestDto.getId());
             });
-
             survey.setTitle(surveyRequestDto.getTitle());
             survey.setDescription(surveyRequestDto.getDescription());
             survey.setQuestions(questions);
             survey.setAssignedTo(users);
-
             surveyRepository.save(survey);
             logger.info("updated survey: " + survey.getId());
-
-            return SurveyResponseDto.builder().title(survey.getTitle()).description(survey.getDescription()).questions(convertToQuestionResponseDto(questions)).assigned(survey.getAssignedTo()).build();
+            return SurveyResponseDto.builder().id(survey.getId()).title(survey.getTitle()).description(survey.getDescription()).questions(convertToQuestionResponseDto(questions)).assigned(survey.getAssignedTo()).build();
         } else {
             logger.info("survey details not found");
             throw new NotFoundException("survey details not found");
@@ -98,11 +83,12 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public List<SurveyResponseDto> getAllSurveysWithQuestions() {
+        logger.info("get surveys with questions");
         List<Survey> surveyList = surveyRepository.findAll();
         List<SurveyResponseDto> surveyResponseDtoList = new ArrayList<>();
-
         surveyList.forEach(survey -> {
             SurveyResponseDto surveyResponseDto = new SurveyResponseDto();
+            surveyResponseDto.setId(survey.getId());
             surveyResponseDto.setTitle(survey.getTitle());
             surveyResponseDto.setDescription(survey.getDescription());
             try {
@@ -112,28 +98,26 @@ public class SurveyServiceImpl implements SurveyService {
             }
             surveyResponseDto.setAssigned(survey.getAssignedTo());
             surveyResponseDtoList.add(surveyResponseDto);
-
         });
-
         return surveyResponseDtoList;
     }
 
     @Override
     public List<SurveyResponseDto> getUserAssignedSurveys(final String userId) {
+        logger.info("getting surveys assigned for user: " + userId);
         List<Survey> surveyList = surveyRepository.findAll();
         List<SurveyResponseDto> surveyResponseDtoList = new ArrayList<>();
-
-
         surveyList.stream().filter(survey -> {
             List<String> userIds = survey.getAssignedTo();
-
             if (userIds.contains(userId)) {
                 SurveyResponseDto surveyResponseDto = new SurveyResponseDto();
+                surveyResponseDto.setId(survey.getId());
                 surveyResponseDto.setTitle(survey.getTitle());
                 surveyResponseDto.setDescription(survey.getDescription());
                 surveyResponseDto.setQuestions(convertToQuestionResponseDto(survey.getQuestions()));
                 surveyResponseDto.setAssigned(survey.getAssignedTo());
                 surveyResponseDtoList.add(surveyResponseDto);
+                logger.info("total number of survey records: " + surveyResponseDtoList.size());
                 return true;
             } else {
                 return false;
@@ -144,12 +128,12 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public SurveyResponseDto getSurveyById(final String surveyId) {
+        logger.info("getting survey: " + surveyId);
         Optional<Survey> surveyObj = surveyRepository.findById(surveyId);
         if (surveyObj.isPresent()) {
             Survey survey = surveyObj.get();
             List<Question> questions = survey.getQuestions();
-
-            return SurveyResponseDto.builder().title(survey.getTitle()).description(survey.getDescription()).questions(convertToQuestionResponseDto(questions)).assigned(survey.getAssignedTo()).build();
+            return SurveyResponseDto.builder().id(survey.getId()).title(survey.getTitle()).description(survey.getDescription()).questions(convertToQuestionResponseDto(questions)).assigned(survey.getAssignedTo()).build();
         } else {
             logger.info("survey details not found");
             throw new NotFoundException("survey details not found");
@@ -158,6 +142,7 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public void deleteSurveyById(final String surveyId) {
+        logger.info("deleting survey: " + surveyId);
         Optional<Survey> surveyObj = surveyRepository.findById(surveyId);
         if (surveyObj.isPresent()) {
             surveyRepository.deleteById(surveyId);
@@ -165,34 +150,28 @@ public class SurveyServiceImpl implements SurveyService {
             logger.info("survey details not found");
             throw new NotFoundException("survey details not found");
         }
-
     }
 
     private List<QuestionResponseDto> convertToQuestionResponseDto(List<Question> questions) {
-
+        logger.info("map list of questions to list of question response dto");
         List<QuestionResponseDto> questionResponseDtoList = new ArrayList<>();
-
         questions.forEach(question -> {
             QuestionResponseDto questionResponseDto = new QuestionResponseDto();
             questionResponseDto.setId(question.getId());
             questionResponseDto.setText(question.getText());
             questionResponseDto.setType(question.getType());
             questionResponseDto.setOptions(question.getOptions());
-
             questionResponseDtoList.add(questionResponseDto);
         });
-
         return questionResponseDtoList;
     }
 
     private Question convertQuestionResponseDto(QuestionRequestDto questionRequestDto) {
-
         Question question = new Question();
         question.setId(questionRequestDto.getId());
         question.setText(questionRequestDto.getText());
         question.setType(questionRequestDto.getType());
         question.setOptions(questionRequestDto.getOptions());
-
         return question;
     }
 }

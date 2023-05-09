@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService {
             logger.info("retrieving user: " + user.getId());
             List<String> roles = new ArrayList<>();
             user.getRoles().stream().forEach(role -> roles.add(role.getName().name()));
-
             return UserDto.builder().id(user.getId()).username(user.getUsername()).email(user.getEmail()).roles(roles).build();
         } else {
             logger.info("user not found");
@@ -68,7 +67,6 @@ public class UserServiceImpl implements UserService {
             logger.info("retrieving user: " + user.getId());
             List<String> roles = new ArrayList<>();
             user.getRoles().stream().forEach(role -> roles.add(role.getName().name()));
-
             return UserDto.builder().id(user.getId()).username(user.getUsername()).email(user.getEmail()).roles(roles).build();
         } else {
             logger.info("user not found");
@@ -85,9 +83,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String deleteUser(final String userId) {
-
         Optional<User> userObj = userRepository.findById(userId);
-
         if (userObj.isPresent()) {
             User user = userObj.get();
             logger.info("retrieving user: " + user.getId());
@@ -98,8 +94,6 @@ public class UserServiceImpl implements UserService {
             logger.info("deleting user: " + userId + " failed");
             throw new NotFoundException("user not found");
         }
-
-
     }
 
     @Override
@@ -107,7 +101,6 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(resetPasswordRequestDto.getEmail())) {
             logger.info("resetting password");
             Optional<User> userObj = userRepository.findByUsername(resetPasswordRequestDto.getUsername());
-
             if (userObj.isPresent()) {
                 User user = userObj.get();
                 logger.info("resetting password of user: " + user.getId());
