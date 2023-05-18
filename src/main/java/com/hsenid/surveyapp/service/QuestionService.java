@@ -12,7 +12,7 @@ public interface QuestionService {
      *
      * @return a QuestionResponseDto
      */
-    QuestionResponseDto createQuestion(QuestionRequestDto questionRequestDto);
+    QuestionResponseDto createQuestion(String surveyI,QuestionRequestDto questionRequestDto);
 
     /**
      * update question

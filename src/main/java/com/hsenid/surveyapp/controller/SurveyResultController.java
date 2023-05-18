@@ -1,14 +1,13 @@
 package com.hsenid.surveyapp.controller;
 
-import com.hsenid.surveyapp.dto.QuestionResponseDto;
-import com.hsenid.surveyapp.dto.SurveyResultListResponseDto;
-import com.hsenid.surveyapp.dto.SurveyResultRequestDto;
-import com.hsenid.surveyapp.dto.SurveyResultResponseDto;
+import com.hsenid.surveyapp.dto.*;
 import com.hsenid.surveyapp.service.SurveyResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -40,5 +39,42 @@ public class SurveyResultController {
     public ResponseEntity<SurveyResultListResponseDto> viewSurveyResults(@PathVariable(value = "id") final String surveyId) {
         SurveyResultListResponseDto surveyResultListResponseDto = surveyResultService.viewSurveyResults(surveyId);
         return new ResponseEntity<>(surveyResultListResponseDto, HttpStatus.OK);
+    }
+
+    /**
+     * get user complete surveys
+     *
+     * @param userId given user id
+     * @return a {@link QuestionResponseDto} object
+     */
+    @GetMapping("assigned/{user-id}")
+    public ResponseEntity<SurveyListResponseDto> viewUserCompletedSurveys(@PathVariable(value = "user-id") final String userId) {
+        List<SurveyResponseDto> surveyResponseDtoList = surveyResultService.viewUserCompletedSurveys(userId);
+        return new ResponseEntity(surveyResponseDtoList, HttpStatus.OK);
+    }
+
+    /**
+     * get result for a survey submitted by a certain user
+     *
+     * @param surveyId given survey id
+     * @param userId given user id
+     * @return a {@link QuestionResponseDto} object
+     */
+    @GetMapping("submitted/{survey-id}/{user-id}")
+    public ResponseEntity<SurveyResultResponseDto> viewUserSubmittedResult(@PathVariable(value = "survey-id") final String surveyId, @PathVariable(value = "user-id") final String userId) {
+        SurveyResultResponseDto surveyResultResponseDto = surveyResultService.viewUserSubmittedResult(surveyId, userId);
+        return new ResponseEntity<>(surveyResultResponseDto, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/list")
+    public ResponseEntity<SurveyResultListResponseDto> getSurveysWithQuestions() {
+        SurveyResultListResponseDto surveyResultListResponseDtoList = surveyResultService.getAllSurveys();
+        return new ResponseEntity(surveyResultListResponseDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/listall")
+    public QuestionAnswerResponseListDto getAllWithAnswers(){
+        return surveyResultService.getResponseData(surveyResultService.getAllSurveys());
     }
 }

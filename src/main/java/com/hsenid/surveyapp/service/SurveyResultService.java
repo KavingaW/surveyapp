@@ -1,8 +1,8 @@
 package com.hsenid.surveyapp.service;
 
-import com.hsenid.surveyapp.dto.SurveyResultListResponseDto;
-import com.hsenid.surveyapp.dto.SurveyResultRequestDto;
-import com.hsenid.surveyapp.dto.SurveyResultResponseDto;
+import com.hsenid.surveyapp.dto.*;
+
+import java.util.List;
 
 public interface SurveyResultService {
 
@@ -19,4 +19,17 @@ public interface SurveyResultService {
      * @return a SurveyResultListResponseDto
      */
     SurveyResultListResponseDto viewSurveyResults(String surveyId);
+
+    /**
+     * get user completed surveys
+     *
+     * @return a SurveyResultListResponseDto
+     */
+    List<SurveyResponseDto> viewUserCompletedSurveys(String userId);
+
+    SurveyResultResponseDto viewUserSubmittedResult(final String surveyId, final String userId);
+
+    SurveyResultListResponseDto getAllSurveys();
+
+    QuestionAnswerResponseListDto getResponseData(SurveyResultListResponseDto surveyResultListResponseDto);
 }

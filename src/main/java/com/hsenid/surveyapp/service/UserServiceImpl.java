@@ -2,18 +2,22 @@ package com.hsenid.surveyapp.service;
 
 import com.hsenid.surveyapp.dto.ResetPasswordRequestDto;
 import com.hsenid.surveyapp.dto.UserDto;
+import com.hsenid.surveyapp.dto.UserResponseDto;
 import com.hsenid.surveyapp.exceptions.NotFoundException;
 import com.hsenid.surveyapp.model.User;
 import com.hsenid.surveyapp.repositoy.UserRepository;
+import io.micrometer.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.Role;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,9 +36,12 @@ public class UserServiceImpl implements UserService {
         if (userObj.isPresent()) {
             User user = userObj.get();
             logger.info("updating user: " + user.getId());
+            logger.info("dto user: " + userDto.getId());
             user.setUsername(userDto.getUsername());
             user.setEmail(userDto.getEmail());
-            user.setPassword(encoder.encode(userDto.getPassword()));
+            if (StringUtils.isNotBlank(userDto.getPassword())) {
+                user.setPassword(encoder.encode(userDto.getPassword()));
+            }
             userRepository.save(user);
             logger.info("updated user: " + user.getId());
             return userDto;
@@ -52,7 +59,7 @@ public class UserServiceImpl implements UserService {
             logger.info("retrieving user: " + user.getId());
             List<String> roles = new ArrayList<>();
             user.getRoles().stream().forEach(role -> roles.add(role.getName().name()));
-            return UserDto.builder().id(user.getId()).username(user.getUsername()).email(user.getEmail()).roles(roles).build();
+            return UserDto.builder().id(user.getId()).username(user.getUsername()).email(user.getEmail()).role(roles).build();
         } else {
             logger.info("user not found");
             throw new NotFoundException("user not found");
@@ -67,7 +74,7 @@ public class UserServiceImpl implements UserService {
             logger.info("retrieving user: " + user.getId());
             List<String> roles = new ArrayList<>();
             user.getRoles().stream().forEach(role -> roles.add(role.getName().name()));
-            return UserDto.builder().id(user.getId()).username(user.getUsername()).email(user.getEmail()).roles(roles).build();
+            return UserDto.builder().id(user.getId()).username(user.getUsername()).email(user.getEmail()).role(roles).build();
         } else {
             logger.info("user not found");
             throw new NotFoundException("user not found");
@@ -75,10 +82,46 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         logger.info("getting list of users");
+        List<UserResponseDto> userResponseDtoList = new ArrayList<>();
         List<User> users = userRepository.findAll();
-        return users;
+
+        users.forEach(user -> {
+            //String role = user.getRoles().contains();
+            user.getRoles().stream().filter(role -> {
+                if (role.getName().name().equals("ROLE_USER")) {
+                    UserResponseDto userResponseDto = new UserResponseDto();
+                    userResponseDto.setUsername(user.getUsername());
+                    userResponseDto.setEmail(user.getEmail());
+                    userResponseDto.setId(user.getId());
+                    userResponseDtoList.add(userResponseDto);
+                    return true;
+                } else {
+                    return false;
+                }
+            }).collect(Collectors.toList());
+        });
+//            if (user.getRoles().contains("ROLE_USER")) {
+//                UserResponseDto userResponseDto = new UserResponseDto();
+//                userResponseDto.setUsername(user.getUsername());
+//                userResponseDto.setEmail(user.getEmail());
+//                userResponseDto.setId(user.getId());
+//                userResponseDtoList.add(userResponseDto);
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        }).collect(Collectors.toList());
+
+//        users.stream().forEach(user -> {
+//            UserResponseDto userResponseDto = new UserResponseDto();
+//            userResponseDto.setUsername(user.getUsername());
+//            userResponseDto.setEmail(user.getEmail());
+//            userResponseDto.setId(user.getId());
+//            userResponseDtoList.add(userResponseDto);
+//        });
+        return userResponseDtoList;
     }
 
     @Override

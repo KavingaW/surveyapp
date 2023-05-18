@@ -26,9 +26,9 @@ public class QuestionController {
      * @param questionRequestDto given QuestionRequestDto object
      * @return a {@link QuestionResponseDto} object
      */
-    @PostMapping("/add")
-    public ResponseEntity<QuestionResponseDto> addQuestion(@RequestBody final QuestionRequestDto questionRequestDto) {
-        QuestionResponseDto questionResponseDto = questionService.createQuestion(questionRequestDto);
+    @PostMapping("/{survey-id}")
+    public ResponseEntity<QuestionResponseDto> addQuestion(@PathVariable(value = "survey-id") final String surveyId, @RequestBody final QuestionRequestDto questionRequestDto) {
+        QuestionResponseDto questionResponseDto = questionService.createQuestion(surveyId,questionRequestDto);
         return new ResponseEntity<>(questionResponseDto, HttpStatus.CREATED);
     }
 

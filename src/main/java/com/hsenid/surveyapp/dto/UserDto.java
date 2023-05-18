@@ -11,7 +11,7 @@ public class UserDto {
     private String username;
     private String email;
     private String password;
-    private List<String> roles;
+    private List<String> role;
 
     public UserDto() {
     }
@@ -21,7 +21,7 @@ public class UserDto {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.roles = roles;
+        this.role = roles;
     }
 
     public String getId() {
@@ -56,11 +56,11 @@ public class UserDto {
         this.password = password;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public List<String> getRole() {
+        return role;
     }
 
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
+    public void setRole(List<String> role) {
+        this.role = role;
     }
 }

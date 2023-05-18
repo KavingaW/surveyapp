@@ -4,7 +4,9 @@ import com.hsenid.surveyapp.dto.QuestionRequestDto;
 import com.hsenid.surveyapp.dto.QuestionResponseDto;
 import com.hsenid.surveyapp.exceptions.NotFoundException;
 import com.hsenid.surveyapp.model.Question;
+import com.hsenid.surveyapp.model.Survey;
 import com.hsenid.surveyapp.repositoy.QuestionRepository;
+import com.hsenid.surveyapp.repositoy.SurveyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +21,32 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
     QuestionRepository questionRepository;
+    @Autowired
+    SurveyRepository surveyRepository;
 
     Logger logger = LoggerFactory.getLogger(QuestionServiceImpl.class);
 
     @Override
-    public QuestionResponseDto createQuestion(final QuestionRequestDto questionRequestDto) {
+    public QuestionResponseDto createQuestion(final String surveyId, final QuestionRequestDto questionRequestDto) {
         logger.info("creating new question...");
+
         Question question = new Question();
         question.setText(questionRequestDto.getText());
         question.setType(questionRequestDto.getType());
         question.setOptions(questionRequestDto.getOptions());
         Question ques = questionRepository.save(question);
         logger.info("created new question");
+
+        Optional<Survey> surveyObj = surveyRepository.findById(surveyId);
+        if (surveyObj.isPresent()) {
+            logger.info("adding new question to survey");
+            Survey survey = surveyObj.get();
+            List<Question> questions = survey.getQuestions();
+            questions.add(question);
+            survey.setQuestions(questions);
+            logger.info("new question added to survey:" +surveyId);
+            surveyRepository.save(survey);
+        }
         return QuestionResponseDto.builder().id(ques.getId()).text(question.getText()).type(question.getType()).options(question.getOptions()).build();
     }
 

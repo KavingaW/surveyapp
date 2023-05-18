@@ -1,12 +1,12 @@
 package com.hsenid.surveyapp.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Builder
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserResponseDto {
     private String id;
     private String username;

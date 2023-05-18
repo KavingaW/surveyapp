@@ -4,7 +4,9 @@ import com.hsenid.surveyapp.dto.*;
 import com.hsenid.surveyapp.exceptions.NotFoundException;
 import com.hsenid.surveyapp.model.Question;
 import com.hsenid.surveyapp.model.Survey;
+import com.hsenid.surveyapp.model.User;
 import com.hsenid.surveyapp.repositoy.SurveyRepository;
+import com.hsenid.surveyapp.repositoy.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +14,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class SurveyServiceImpl implements SurveyService {
 
+
     @Autowired
     SurveyRepository surveyRepository;
+    @Autowired
+    UserRepository userRepository;
 
     Logger logger = LoggerFactory.getLogger(SurveyServiceImpl.class);
 
@@ -29,17 +35,21 @@ public class SurveyServiceImpl implements SurveyService {
         Survey survey = new Survey();
         List<Question> questions = new ArrayList<>();
         List<String> users = new ArrayList<>();
-        surveyRequestDto.getQuestions().stream().forEach(questionDto -> {
-            Question question = new Question();
-            question.setId(questionDto.getId());
-            question.setText(questionDto.getText());
-            question.setType(questionDto.getType());
-            question.setOptions(questionDto.getOptions());
-            questions.add(question);
-        });
-        surveyRequestDto.getAssigned().stream().forEach(userRequestDto -> {
-            users.add(userRequestDto.getId());
-        });
+        if (Objects.nonNull(surveyRequestDto.getQuestions())) {
+            surveyRequestDto.getQuestions().stream().forEach(questionDto -> {
+                Question question = new Question();
+                question.setId(questionDto.getId());
+                question.setText(questionDto.getText());
+                question.setType(questionDto.getType());
+                question.setOptions(questionDto.getOptions());
+                questions.add(question);
+            });
+        }
+        if (Objects.nonNull(surveyRequestDto.getAssigned())) {
+            surveyRequestDto.getAssigned().stream().forEach(userRequestDto -> {
+                users.add(userRequestDto.getId());
+            });
+        }
         survey.setTitle(surveyRequestDto.getTitle());
         survey.setDescription(surveyRequestDto.getDescription());
         survey.setQuestions(questions);
@@ -57,17 +67,21 @@ public class SurveyServiceImpl implements SurveyService {
             Survey survey = surveyObj.get();
             List<Question> questions = new ArrayList<>();
             List<String> users = new ArrayList<>();
-            surveyRequestDto.getQuestions().forEach(questionDto -> {
-                Question question = new Question();
-                question.setId(questionDto.getId());
-                question.setText(questionDto.getText());
-                question.setType(questionDto.getType());
-                question.setOptions(questionDto.getOptions());
-                questions.add(question);
-            });
-            surveyRequestDto.getAssigned().stream().forEach(userRequestDto -> {
-                users.add(userRequestDto.getId());
-            });
+            if (Objects.nonNull(surveyRequestDto.getQuestions())) {
+                surveyRequestDto.getQuestions().forEach(questionDto -> {
+                    Question question = new Question();
+                    question.setId(questionDto.getId());
+                    question.setText(questionDto.getText());
+                    question.setType(questionDto.getType());
+                    question.setOptions(questionDto.getOptions());
+                    questions.add(question);
+                });
+            }
+            if (Objects.nonNull(surveyRequestDto.getAssigned())) {
+                surveyRequestDto.getAssigned().stream().forEach(userRequestDto -> {
+                    users.add(userRequestDto.getId());
+                });
+            }
             survey.setTitle(surveyRequestDto.getTitle());
             survey.setDescription(surveyRequestDto.getDescription());
             survey.setQuestions(questions);
@@ -96,7 +110,12 @@ public class SurveyServiceImpl implements SurveyService {
             } catch (Exception exception) {
                 surveyResponseDto.setQuestions(null);
             }
-            surveyResponseDto.setAssigned(survey.getAssignedTo());
+            List<User> users = userRepository.findAllById(survey.getAssignedTo());
+            List<String> assignedUsers = new ArrayList<>();
+            users.forEach(user -> {
+                assignedUsers.add(user.getUsername());
+            });
+            surveyResponseDto.setAssigned(assignedUsers);
             surveyResponseDtoList.add(surveyResponseDto);
         });
         return surveyResponseDtoList;
@@ -133,7 +152,13 @@ public class SurveyServiceImpl implements SurveyService {
         if (surveyObj.isPresent()) {
             Survey survey = surveyObj.get();
             List<Question> questions = survey.getQuestions();
-            return SurveyResponseDto.builder().id(survey.getId()).title(survey.getTitle()).description(survey.getDescription()).questions(convertToQuestionResponseDto(questions)).assigned(survey.getAssignedTo()).build();
+
+            List<User> users = userRepository.findAllById(survey.getAssignedTo());
+            List<String> assignedUsers = new ArrayList<>();
+            users.forEach(user -> {
+                assignedUsers.add(user.getUsername());
+            });
+            return SurveyResponseDto.builder().id(survey.getId()).title(survey.getTitle()).description(survey.getDescription()).questions(convertToQuestionResponseDto(questions)).assigned(assignedUsers).build();
         } else {
             logger.info("survey details not found");
             throw new NotFoundException("survey details not found");
@@ -155,14 +180,18 @@ public class SurveyServiceImpl implements SurveyService {
     private List<QuestionResponseDto> convertToQuestionResponseDto(List<Question> questions) {
         logger.info("map list of questions to list of question response dto");
         List<QuestionResponseDto> questionResponseDtoList = new ArrayList<>();
-        questions.forEach(question -> {
-            QuestionResponseDto questionResponseDto = new QuestionResponseDto();
-            questionResponseDto.setId(question.getId());
-            questionResponseDto.setText(question.getText());
-            questionResponseDto.setType(question.getType());
-            questionResponseDto.setOptions(question.getOptions());
-            questionResponseDtoList.add(questionResponseDto);
-        });
+        if (!questions.isEmpty()) {
+            questions.forEach(question -> {
+                if (Objects.nonNull(question)) {
+                    QuestionResponseDto questionResponseDto = new QuestionResponseDto();
+                    questionResponseDto.setId(question.getId());
+                    questionResponseDto.setText(question.getText());
+                    questionResponseDto.setType(question.getType());
+                    questionResponseDto.setOptions(question.getOptions());
+                    questionResponseDtoList.add(questionResponseDto);
+                }
+            });
+        }
         return questionResponseDtoList;
     }
 
