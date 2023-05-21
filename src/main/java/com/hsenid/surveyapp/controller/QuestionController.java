@@ -8,6 +8,7 @@ import com.hsenid.surveyapp.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class QuestionController {
      * @return a {@link QuestionResponseDto} object
      */
     @PostMapping("/{survey-id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<QuestionResponseDto> addQuestion(@PathVariable(value = "survey-id") final String surveyId, @RequestBody final QuestionRequestDto questionRequestDto) {
         QuestionResponseDto questionResponseDto = questionService.createQuestion(surveyId,questionRequestDto);
         return new ResponseEntity<>(questionResponseDto, HttpStatus.CREATED);
@@ -39,6 +41,7 @@ public class QuestionController {
      * @return a {@link QuestionResponseDto} object
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<QuestionResponseDto> updateQuestion(@PathVariable(value = "id") final String questionId, @RequestBody final QuestionRequestDto questionRequestDto) {
         QuestionResponseDto questionResponseDto = questionService.updateQuestion(questionRequestDto, questionId);
         return new ResponseEntity<>(questionResponseDto, HttpStatus.OK);
@@ -51,6 +54,7 @@ public class QuestionController {
      * @return a {@link QuestionResponseDto} object
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DeleteResponseDto> deleteQuestion(@PathVariable(value = "id") final String questionId) {
         questionService.deleteQuestion(questionId);
         DeleteResponseDto responseDto = DeleteResponseDto.builder().code("200").message("Deleted").build();
@@ -64,6 +68,7 @@ public class QuestionController {
      * @return a {@link QuestionResponseDto} object
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<QuestionResponseDto> getQuestionById(@PathVariable(value = "id") final String questionId) {
         QuestionResponseDto questionResponseDto = questionService.getQuestionById(questionId);
         return new ResponseEntity(questionResponseDto, HttpStatus.OK);
@@ -75,6 +80,7 @@ public class QuestionController {
      * @return a {@link QuestionListResponseDto} object
      */
     @GetMapping("/list")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<QuestionListResponseDto> getQuestions() {
         List<QuestionResponseDto> questionResponseDto = questionService.getQuestions();
         return new ResponseEntity(questionResponseDto, HttpStatus.OK);
@@ -87,6 +93,7 @@ public class QuestionController {
      * @return a {@link QuestionResponseDto} object
      */
     @GetMapping("/type/{type}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<QuestionListResponseDto> getQuestionsByType(@PathVariable(value = "type") final String type) {
         List<QuestionResponseDto> questionResponseDto = questionService.getQuestionsByType(type);
         return new ResponseEntity(questionResponseDto, HttpStatus.OK);

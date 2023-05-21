@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DeleteResponseDto> deleteUser(@PathVariable(value = "id") final String userId) {
         userService.deleteUser(userId);
         DeleteResponseDto responseDto = DeleteResponseDto.builder().code("200").message("Deleted").build();
@@ -55,11 +55,5 @@ public class UserController {
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         List<UserResponseDto> userResponseDtoList = userService.getAllUsers();
         return new ResponseEntity(userResponseDtoList, HttpStatus.OK);
-    }
-
-    @PostMapping("/resetPassword")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<String> resetPassword(@RequestBody final ResetPasswordRequestDto resetPasswordRequestDto) {
-        return new ResponseEntity(userService.resetPassword(resetPasswordRequestDto), HttpStatus.OK);
     }
 }

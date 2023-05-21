@@ -27,9 +27,25 @@ public interface SurveyResultService {
      */
     List<SurveyResponseDto> viewUserCompletedSurveys(String userId);
 
+    /**
+     * get specific user result of specific surve
+     *
+     * @return a SurveyResultResponseDto
+     */
     SurveyResultResponseDto viewUserSubmittedResult(final String surveyId, final String userId);
 
-    SurveyResultListResponseDto getAllSurveys();
+    /**
+     * get all survey results
+     *
+     * @return a SurveyResultResponseDto
+     */
+    List<SurveyResponseDto> getAllSurveys();
 
-    QuestionAnswerResponseListDto getResponseData(SurveyResultListResponseDto surveyResultListResponseDto);
+
+    /**
+     * get survey results data
+     *
+     * @return a SurveyResultResponseDto
+     */
+    SurveyAnswerResponseDto getResponseData(String surveyId);
 }

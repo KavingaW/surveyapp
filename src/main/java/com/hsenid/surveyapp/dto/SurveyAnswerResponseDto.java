@@ -1,5 +1,4 @@
 package com.hsenid.surveyapp.dto;
-
 import lombok.*;
 
 import java.util.List;
@@ -9,6 +8,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionAnswerResponseListDto {
+public class SurveyAnswerResponseDto {
+    String id;
+    String surveyName;
+    List<String> users;
     List<QuestionAnswerResponseDto> questionAnswerResponseDtoList;
+    Integer totResponses;
 }

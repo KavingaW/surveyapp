@@ -14,12 +14,13 @@ public class Survey {
     private String description;
     @DBRef
     private List<Question> questions;
-    private List<String> assignedTo;
+    @DBRef
+    private List<User> assignedTo;
 
     public Survey() {
     }
 
-    public Survey(String id, String title, String description, List<Question> questions, List<String> assignedTo) {
+    public Survey(String id, String title, String description, List<Question> questions, List<User> assignedTo) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -59,11 +60,11 @@ public class Survey {
         this.questions = questions;
     }
 
-    public List<String> getAssignedTo() {
+    public List<User> getAssignedTo() {
         return assignedTo;
     }
 
-    public void setAssignedTo(List<String> assignedTo) {
+    public void setAssignedTo(List<User> assignedTo) {
         this.assignedTo = assignedTo;
     }
 }

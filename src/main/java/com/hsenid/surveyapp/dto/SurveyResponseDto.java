@@ -14,5 +14,5 @@ public class SurveyResponseDto {
     private String title;
     private String description;
     private List<QuestionResponseDto> questions;
-    private List<String> assigned;
+    private List<UserResponseDto> assigned;
 }

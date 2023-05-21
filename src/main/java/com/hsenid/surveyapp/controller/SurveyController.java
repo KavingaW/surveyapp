@@ -42,6 +42,7 @@ public class SurveyController {
      * @return a {@link SurveyResponseDto} object
      */
     @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SurveyResponseDto> addSurvey(@RequestBody final SurveyRequestDto surveyRequestDto) {
         SurveyResponseDto surveyResponseDto = surveyService.createSurvey(surveyRequestDto);
         return new ResponseEntity<>(surveyResponseDto, HttpStatus.OK);
@@ -53,6 +54,7 @@ public class SurveyController {
      * @return a {@link SurveyListResponseDto} object
      */
     @GetMapping("/list")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<SurveyListResponseDto> getSurveysWithQuestions() {
         List<SurveyResponseDto> surveyResponseDtoList = surveyService.getAllSurveysWithQuestions();
         return new ResponseEntity(surveyResponseDtoList, HttpStatus.OK);
@@ -65,6 +67,7 @@ public class SurveyController {
      * @return a {@link SurveyListResponseDto} object
      */
     @GetMapping("/list/{user-id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<SurveyListResponseDto> getUserAssignedSurveys(@PathVariable(value = "user-id") final String userId) {
         List<SurveyResponseDto> surveyResponseDtoList = surveyService.getUserAssignedSurveys(userId);
         return new ResponseEntity(surveyResponseDtoList, HttpStatus.OK);
@@ -77,6 +80,7 @@ public class SurveyController {
      * @return a {@link SurveyResponseDto} object
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SurveyResponseDto> updateSurvey(@PathVariable(value = "id") final String surveyId, @RequestBody final SurveyRequestDto surveyRequestDto) {
         SurveyResponseDto surveyResponseDto = surveyService.updateSurvey(surveyId, surveyRequestDto);
         return new ResponseEntity<>(surveyResponseDto, HttpStatus.OK);
@@ -89,6 +93,7 @@ public class SurveyController {
      * @return a {@link SurveyResponseDto} object
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<SurveyResponseDto> getSurveyById(@PathVariable(value = "id") final String surveyId) {
         SurveyResponseDto surveyResponseDto = surveyService.getSurveyById(surveyId);
         return new ResponseEntity<>(surveyResponseDto, HttpStatus.OK);
@@ -101,6 +106,7 @@ public class SurveyController {
      * @return a {@link DeleteResponseDto} object
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DeleteResponseDto> deleteSurveyById(@PathVariable(value = "id") final String surveyId) {
         surveyService.deleteSurveyById(surveyId);
         DeleteResponseDto deleteResponseDto = DeleteResponseDto.builder().code("200").message("DELETED").build();

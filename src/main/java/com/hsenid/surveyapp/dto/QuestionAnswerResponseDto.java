@@ -3,6 +3,7 @@ package com.hsenid.surveyapp.dto;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -11,6 +12,7 @@ import java.util.List;
 @Builder
 public class QuestionAnswerResponseDto {
 
-    String question;
-    List<AnswerDto> answerDto;
+    String id;
+    String text;
+    Map<String, Integer> responseAnswerMap;
 }
