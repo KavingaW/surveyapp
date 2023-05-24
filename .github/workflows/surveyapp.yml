@@ -3,7 +3,7 @@ name: surveyapp-BE
 on:
   push:
     branches:
-      - main
+      - 'main'
 
 jobs:
   build:
@@ -35,5 +35,5 @@ jobs:
       - name: Stop MongoDB
         run: docker-compose down
 
-    volumes:
-      mongodb-data:
+volumes:
+  mongodb-data:
