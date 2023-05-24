@@ -3,7 +3,7 @@ name: surveyapp-BE
 on:
   push:
     branches:
-      - 'main/**'
+      - 'main'
 
 jobs:
   build:
@@ -25,6 +25,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
+          distribution: 'adopt'
 
       - name: Start MongoDB
         run: docker-compose up -d
@@ -34,3 +35,6 @@ jobs:
 
       - name: Stop MongoDB
         run: docker-compose down
+
+volumes:
+  mongodb-data:
