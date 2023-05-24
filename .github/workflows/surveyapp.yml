@@ -14,8 +14,6 @@ jobs:
         image: mongo
         ports:
           - 27017:27017
-        volumes:
-          - mongodb-data:/data/db
 
     steps:
       - name: Checkout code
@@ -31,6 +29,3 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t surveyapp .
-
-volumes:
-  mongodb-data:
