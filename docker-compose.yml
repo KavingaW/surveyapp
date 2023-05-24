@@ -1,20 +1,42 @@
-version:
-services:
-  mongodb:
-    image: mongo
-    ports:
-      - 27017:27017
-    volumes:
-      - mongodb-data:/data/db
+name: Build and Test
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - 8080:8080
-    depends_on:
-      - mongodb
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+        volumes:
+          - mongodb-data:/data/db
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+
+      - name: Start MongoDB
+        run: docker-compose up -d
+
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+
+      - name: Run Tests
+        run: mvn test
+
+      - name: Stop MongoDB
+        run: docker-compose down
 
 volumes:
   mongodb-data:

@@ -1,0 +1,31 @@
+
+name: Build
+
+on:
+  push:
+    branches:
+      - 'main /**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+
+      # You can add additional steps here, such as running tests or generating artifacts
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: surveyapp-jar
+          path: target/surveyapp.jar

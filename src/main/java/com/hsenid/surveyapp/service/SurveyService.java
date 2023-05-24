@@ -1,10 +1,7 @@
 package com.hsenid.surveyapp.service;
 
-import com.hsenid.surveyapp.dto.QuestionResponseDto;
 import com.hsenid.surveyapp.dto.SurveyRequestDto;
 import com.hsenid.surveyapp.dto.SurveyResponseDto;
-import com.hsenid.surveyapp.dto.SurveyResultListResponseDto;
-import com.hsenid.surveyapp.model.Question;
 
 import java.util.List;
 
