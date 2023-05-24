@@ -1,14 +1,21 @@
-
-name: Build
+name: surveyapp-BE
 
 on:
   push:
     branches:
-      - 'main /**'
+      - 'master/**'
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+        volumes:
+          - mongodb-data:/data/db
 
     steps:
       - name: Checkout code
@@ -19,13 +26,17 @@ jobs:
         with:
           java-version: 17
 
+      - name: Start MongoDB
+        run: docker-compose up -d
+
       - name: Build with Maven
         run: mvn clean install -DskipTests
 
-      # You can add additional steps here, such as running tests or generating artifacts
+      - name: Run Tests
+        run: mvn test
 
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: surveyapp-jar
-          path: target/surveyapp.jar
+      - name: Stop MongoDB
+        run: docker-compose down
+
+volumes:
+  mongodb-data:
