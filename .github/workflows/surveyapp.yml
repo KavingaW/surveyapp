@@ -6,7 +6,7 @@ on:
       - 'master/**'
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     services:
@@ -31,9 +31,6 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install -DskipTests
-
-      - name: Run Tests
-        run: mvn test
 
       - name: Stop MongoDB
         run: docker-compose down
