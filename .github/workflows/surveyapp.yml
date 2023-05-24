@@ -25,16 +25,12 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 17
-          distribution: 'adopt'
-
-      - name: Start MongoDB
-        run: docker-compose up -d
 
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: mvn clean package -DskipTests
 
-      - name: Stop MongoDB
-        run: docker-compose down
+      - name: Build Docker image
+        run: docker build -t surveyapp .
 
 volumes:
   mongodb-data:
