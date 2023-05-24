@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        max-parallel: [ 1 ]
+
     services:
       mongodb:
         image: mongo
