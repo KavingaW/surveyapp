@@ -34,6 +34,3 @@ jobs:
 
       - name: Stop MongoDB
         run: docker-compose down
-
-volumes:
-  mongodb-data:
